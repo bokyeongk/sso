@@ -1,11 +1,11 @@
-import keycloak from '../lib/keycloak'
+import { useAuth } from '../hooks/useAuth'
 import { useServices } from '../hooks/useServices'
 import { ServiceCard } from '../components/service/ServiceCard'
 import { ServiceEmptyState } from '../components/service/ServiceEmptyState'
 
 export function HomePage() {
+  const { user, logout } = useAuth()
   const { data: services, isLoading, isError } = useServices()
-  const user = keycloak.tokenParsed as { name?: string; email?: string } | undefined
 
   return (
     <div className="home-page">
@@ -17,7 +17,7 @@ export function HomePage() {
               <p className="home-user">{user.name}{user.email && ` (${user.email})`}</p>
             )}
           </div>
-          <button className="logout-btn" onClick={() => keycloak.logout()}>
+          <button className="logout-btn" onClick={logout}>
             로그아웃
           </button>
         </div>

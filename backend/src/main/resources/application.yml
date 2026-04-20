@@ -23,6 +23,18 @@ spring:
         jwt:
           issuer-uri: ${KEYCLOAK_ISSUER_URI}
 
+keycloak:
+  url: ${KEYCLOAK_URL}
+  realm: ${KEYCLOAK_REALM}
+  client-id: ${KEYCLOAK_CLIENT_ID}
+  redirect-uri: ${KEYCLOAK_REDIRECT_URI}
+
+cookie:
+  secure: ${COOKIE_SECURE:false}
+
+allowed:
+  origin: ${ALLOWED_ORIGIN:http://localhost:5173}
+
 server:
   port: 8080
   forward-headers-strategy: framework

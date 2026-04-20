@@ -1,28 +1,26 @@
 import axios from 'axios'
-import keycloak from './keycloak'
+import { authStore } from '../store/authStore'
+import { startLogin } from './auth'
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-})
-
-apiClient.interceptors.request.use(async (config) => {
-  if (keycloak.authenticated) {
-    try {
-      await keycloak.updateToken(30)
-    } catch {
-      keycloak.login()
-      return Promise.reject(new Error('Token refresh failed'))
-    }
-    config.headers.Authorization = `Bearer ${keycloak.token}`
-  }
-  return config
+  withCredentials: true,
 })
 
 apiClient.interceptors.response.use(
   (res) => res,
-  (error) => {
-    if (error.response?.status === 401) {
-      keycloak.login()
+  async (error) => {
+    const config = error.config
+    const isRefreshRequest = config?.url?.includes('/api/auth/refresh')
+    if (error.response?.status === 401 && !config._retry && !isRefreshRequest) {
+      config._retry = true
+      try {
+        await apiClient.post('/api/auth/refresh')
+        return apiClient(config)
+      } catch {
+        authStore.setAuthenticated(false)
+        startLogin()
+      }
     }
     return Promise.reject(error)
   }
