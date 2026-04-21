@@ -42,7 +42,8 @@ public class SecurityConfig {
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/api/auth/token",
-                    "/api/auth/refresh"
+                    "/api/auth/refresh",
+                    "/api/auth/logout"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

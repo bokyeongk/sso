@@ -1,0 +1,33 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: sso-route
+          uri: http://localhost:8080
+          predicates:
+            - Path=/api/sso/**
+          filters:
+            - RewritePath=/api/sso(?<segment>.*), /api${segment}
+        - id: sjeasy-route
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/sjeasy/**
+          filters:
+            - RewritePath=/api/sjeasy(?<segment>.*), /api${segment}
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    com.hubilon.gateway.filter: INFO
+
+sso:
+  introspect-url: http://localhost:8080/api/auth/me
+  login-page-url: http://localhost:5173/login
+
+allowed:
+  origin: http://localhost:5173

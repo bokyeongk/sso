@@ -19,7 +19,14 @@ apiClient.interceptors.response.use(
         return apiClient(config)
       } catch {
         authStore.setAuthenticated(false)
-        startLogin()
+        const redirectTo = (error as { response?: { headers?: Record<string, string> } })
+          .response?.headers?.['x-redirect-to']
+        if (redirectTo) {
+          window.location.href = redirectTo
+        } else {
+          startLogin()
+        }
+        return Promise.reject(error)
       }
     }
     return Promise.reject(error)

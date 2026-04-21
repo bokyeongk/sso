@@ -15,7 +15,7 @@ export function useAuth() {
     logout: async () => {
       await startLogout()
       authStore.setAuthenticated(false)
-      window.location.href = '/'
+      window.location.href = '/login'
     },
   }
 }

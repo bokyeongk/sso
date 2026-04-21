@@ -4,7 +4,11 @@
       "Bash(./gradlew test *)",
       "Bash(npm install *)",
       "Bash(npm uninstall *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(xargs grep *)",
+      "Bash(sed -i 's|login-page-url: http://localhost:5173$|login-page-url: http://localhost:5173/login|' \"/c/workspace/00.base/claude/00.sso/sso/gateway/src/main/resources/application.yml\")",
+      "Bash(sed -i \"s|pathname === '/callback'\\)|pathname === '/callback' || window.location.pathname === '/login'\\)|\" \"/c/workspace/00.base/claude/00.sso/sso/frontend/src/hooks/useAuthInit.ts\")",
+      "Bash(python3 *)"
     ]
   }
 }

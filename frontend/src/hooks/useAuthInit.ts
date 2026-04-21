@@ -6,7 +6,7 @@ export function useAuthInit() {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    if (window.location.pathname === '/callback') {
+    if (window.location.pathname === '/callback' || window.location.pathname === '/login') {
       setReady(true)
       return
     }
@@ -15,8 +15,13 @@ export function useAuthInit() {
       .then(res => {
         authStore.setAuthenticated(true, res.data.data)
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         authStore.setAuthenticated(false)
+        const axiosError = error as { response?: { headers?: Record<string, string> } }
+        const redirectTo = axiosError.response?.headers?.['x-redirect-to']
+        if (redirectTo) {
+          window.location.href = redirectTo
+        }
       })
       .finally(() => {
         setReady(true)

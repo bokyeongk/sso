@@ -58,8 +58,8 @@ public class AuthApplicationService implements ExchangeTokenUseCase {
                 new HttpEntity<>(params, headers),
                 Void.class
             );
-        } catch (Exception e) {
-            throw new ServiceException(ErrorCode.AUTH_TOKEN_EXCHANGE_FAILED, e);
+        } catch (Exception ignored) {
+            // Keycloak 로그아웃 실패해도 쿠키 삭제는 보장해야 하므로 예외 무시
         }
     }
 

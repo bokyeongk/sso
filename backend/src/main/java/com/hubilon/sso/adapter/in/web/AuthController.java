@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -59,8 +60,19 @@ public class AuthController {
 
     @GetMapping("/me")
     public ApiResponse<Map<String, String>> me(@AuthenticationPrincipal Jwt jwt) {
+        Map<String, Object> realmAccess = jwt.getClaim("realm_access");
+        String role = "";
+        if (realmAccess != null) {
+            Object rolesObj = realmAccess.get("roles");
+            if (rolesObj instanceof List<?> roles && !roles.isEmpty()) {
+                Object first = roles.get(0);
+                role = first != null ? first.toString() : "";
+            }
+        }
         Map<String, String> user = Map.of(
-            "name", jwt.getClaimAsString("name") != null ? jwt.getClaimAsString("name") : "",
+            "id",    jwt.getSubject() != null ? jwt.getSubject() : "",
+            "role",  role,
+            "name",  jwt.getClaimAsString("name")  != null ? jwt.getClaimAsString("name")  : "",
             "email", jwt.getClaimAsString("email") != null ? jwt.getClaimAsString("email") : ""
         );
         return ApiResponse.ok(user);
@@ -79,7 +91,7 @@ public class AuthController {
             .httpOnly(true)
             .secure(cookieSecure)
             .sameSite("Strict")
-            .path("/api/auth/refresh")
+            .path("/api/auth")
             .maxAge(Duration.ofDays(30).getSeconds())
             .build();
 
@@ -91,7 +103,7 @@ public class AuthController {
         ResponseCookie accessCookie = ResponseCookie.from("access_token", "")
             .httpOnly(true).secure(cookieSecure).sameSite("Strict").path("/").maxAge(0).build();
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", "")
-            .httpOnly(true).secure(cookieSecure).sameSite("Strict").path("/api/auth/refresh").maxAge(0).build();
+            .httpOnly(true).secure(cookieSecure).sameSite("Strict").path("/api/auth").maxAge(0).build();
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
     }
