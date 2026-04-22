@@ -14,7 +14,7 @@
     <div class="login-card">
 
         <div class="login-header">
-            <h1 class="login-title">통합 로그인</h1>
+            <h1 class="login-title">TEST 서비스 로그인</h1>
             <p class="login-desc">Hubilon SSO 서비스에 오신 것을 환영합니다</p>
         </div>
 

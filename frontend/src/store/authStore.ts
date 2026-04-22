@@ -21,9 +21,9 @@ function notify() {
 
 export const authStore = {
   getState: () => state,
-  setAuthenticated(value: boolean, user: AuthUser | null = null) {
-    state.isAuthenticated = value
-    state.user = value ? user : null
+  setAuthenticated(isAuth: boolean, user?: { name: string; email: string }) {
+    state.isAuthenticated = isAuth
+    state.user = isAuth && user ? user : null
     notify()
   },
   subscribe(fn: () => void) {

@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { authStore } from '../store/authStore'
-import { startLogin, startLogout } from '../lib/auth'
+import apiClient from '../lib/apiClient'
 
 export function useAuth() {
   const { isAuthenticated, user } = useSyncExternalStore(
@@ -8,14 +8,18 @@ export function useAuth() {
     authStore.getState
   )
 
+  const logout = async () => {
+    try {
+      await apiClient.post('/logout')
+    } catch {
+      // 로그아웃 실패해도 로컬 상태는 정리
+    }
+    authStore.setAuthenticated(false)
+  }
+
   return {
     isAuthenticated,
     user,
-    login: startLogin,
-    logout: async () => {
-      await startLogout()
-      authStore.setAuthenticated(false)
-      window.location.href = '/login'
-    },
+    logout,
   }
 }

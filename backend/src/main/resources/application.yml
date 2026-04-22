@@ -17,20 +17,6 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
         default_schema: msa-service
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${KEYCLOAK_ISSUER_URI}
-
-keycloak:
-  url: ${KEYCLOAK_URL}
-  realm: ${KEYCLOAK_REALM}
-  client-id: ${KEYCLOAK_CLIENT_ID}
-  redirect-uri: ${KEYCLOAK_REDIRECT_URI}
-
-cookie:
-  secure: ${COOKIE_SECURE:false}
 
 allowed:
   origin: ${ALLOWED_ORIGIN:http://localhost:5173}

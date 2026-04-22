@@ -1,5 +1,5 @@
 server:
-  port: 8000
+  port: ${SERVER_PORT:8000}
 
 spring:
   application:
@@ -8,26 +8,74 @@ spring:
     gateway:
       routes:
         - id: sso-route
-          uri: http://localhost:8080
+          uri: ${SSO_SERVICE_URI:http://localhost:8080}
           predicates:
             - Path=/api/sso/**
           filters:
             - RewritePath=/api/sso(?<segment>.*), /api${segment}
         - id: sjeasy-route
-          uri: http://localhost:8081
+          uri: ${SJEASY_SERVICE_URI:http://localhost:8081}
           predicates:
             - Path=/api/sjeasy/**
           filters:
             - RewritePath=/api/sjeasy(?<segment>.*), /api${segment}
+        - id: test-route
+          uri: ${TEST_SERVICE_URI:http://localhost:8082}
+          predicates:
+            - Path=/api/test/**
+          filters:
+            - RewritePath=/api/test(?<segment>.*), /api${segment}
+
+keycloak:
+  url: ${KEYCLOAK_URL:http://localhost:8000}
+  realm: ${KEYCLOAK_REALM:hubilon_pd}
+  clients:
+    sso-index-web:
+      secret: ${KEYCLOAK_SSO_SECRET:change-me}
+      service-redirect-url: ${SSO_FRONTEND_URL:http://localhost:5173}
+    git-digest-web:
+      secret: ${KEYCLOAK_GIT_SECRET:change-me}
+      service-redirect-url: ${GIT_FRONTEND_URL:http://localhost:5174}
+    test-web:
+      secret: ${KEYCLOAK_TEST_SECRET:change-me}
+      service-redirect-url: ${TEST_FRONTEND_URL:http://localhost:3000}
+
+gateway:
+  base-url: ${GATEWAY_BASE_URL:http://localhost:8000}
+  path-to-client-id:
+    "[/api/sso/**]": sso-index-web
+    "[/api/sjeasy/**]": git-digest-web
+    "[/api/test/**]": test-web
+  allowed-redirect-domains:
+    - localhost:5173
+    - localhost:5174
+    - localhost:3000
+    - localhost:8000
+  state-hmac-secret: ${STATE_HMAC_SECRET:dev-secret-must-be-changed-in-prod-32bytes}
+  jwt-expiry-buffer-seconds: 30
+
+allowed:
+  origin: ${ALLOWED_ORIGIN:http://localhost:5173}
 
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
-    com.hubilon.gateway.filter: INFO
+    com.hubilon.gateway: INFO
 
-sso:
-  introspect-url: http://localhost:8080/api/auth/me
-  login-page-url: http://localhost:5173/login
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+cookie:
+  same-site: Lax
+  secure: false
 
-allowed:
-  origin: http://localhost:5173
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+cookie:
+  same-site: None
+  secure: true

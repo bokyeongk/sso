@@ -8,7 +8,19 @@
       "Bash(xargs grep *)",
       "Bash(sed -i 's|login-page-url: http://localhost:5173$|login-page-url: http://localhost:5173/login|' \"/c/workspace/00.base/claude/00.sso/sso/gateway/src/main/resources/application.yml\")",
       "Bash(sed -i \"s|pathname === '/callback'\\)|pathname === '/callback' || window.location.pathname === '/login'\\)|\" \"/c/workspace/00.base/claude/00.sso/sso/frontend/src/hooks/useAuthInit.ts\")",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(./gradlew bootRun)",
+      "Bash(gradle wrapper *)",
+      "Bash(cp -r /c/workspace/00.base/claude/00.sso/sso/backend/gradle /c/workspace/00.base/claude/00.sso/sso/test-backend/gradle)",
+      "Bash(chmod +x /c/workspace/00.base/claude/00.sso/sso/test-backend/gradlew)",
+      "Bash(start *)",
+      "Bash(npx kill-port *)",
+      "Bash(./gradlew compileJava)",
+      "Bash(cmd.exe /c \"gradlew.bat compileJava 2>&1\")",
+      "Bash(gradle --version)",
+      "Bash(./gradlew build *)",
+      "Bash(cmd /c \"gradlew.bat build -x test 2>&1\")",
+      "Bash(powershell -Command \"& './gradlew' build -x test\")"
     ]
   }
 }
