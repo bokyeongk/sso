@@ -4,17 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hubilon.gateway.config.GatewayProperties;
 import com.hubilon.gateway.config.KeycloakProperties;
 import com.hubilon.gateway.security.JwtVerifier;
+import com.hubilon.gateway.security.LoginUrlBuilder;
 import com.hubilon.gateway.security.StateService;
+import com.hubilon.gateway.util.CookieHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
@@ -27,8 +27,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
@@ -42,7 +40,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     private static final List<String> WHITE_LIST = List.of(
             "/callback/**",
-            "/logout",
+            "/api/logout",
             "/actuator/health",
             "/api-docs/**",
             "/swagger-ui/**",
@@ -59,27 +57,27 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private final KeycloakProperties keycloakProperties;
     private final GatewayProperties gatewayProperties;
     private final StateService stateService;
+    private final CookieHelper cookieHelper;
+    private final LoginUrlBuilder loginUrlBuilder;
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
-
-    @Value("${cookie.same-site:Lax}")
-    private String sameSite;
-
-    @Value("${cookie.secure:false}")
-    private boolean secure;
 
     public AuthenticationFilter(
             JwtVerifier jwtVerifier,
             KeycloakProperties keycloakProperties,
             GatewayProperties gatewayProperties,
             StateService stateService,
+            CookieHelper cookieHelper,
+            LoginUrlBuilder loginUrlBuilder,
             WebClient.Builder webClientBuilder,
             ObjectMapper objectMapper) {
         this.jwtVerifier = jwtVerifier;
         this.keycloakProperties = keycloakProperties;
         this.gatewayProperties = gatewayProperties;
         this.stateService = stateService;
+        this.cookieHelper = cookieHelper;
+        this.loginUrlBuilder = loginUrlBuilder;
         this.webClient = webClientBuilder.build();
         this.objectMapper = objectMapper;
     }
@@ -194,10 +192,10 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
                                         : 1800L;
 
                                 exchange.getResponse().addCookie(
-                                        buildCookie("access_token", newAccessToken, (int) accessTokenExpiresIn));
+                                        cookieHelper.buildCookie("access_token", newAccessToken, (int) accessTokenExpiresIn));
                                 if (newRefreshToken != null) {
                                     exchange.getResponse().addCookie(
-                                            buildCookie("refresh_token", newRefreshToken, (int) refreshTokenExpiresIn));
+                                            cookieHelper.buildCookie("refresh_token", newRefreshToken, (int) refreshTokenExpiresIn));
                                 }
 
                                 return proceedWithJwt(jwt, exchange, chain);
@@ -210,7 +208,11 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     }
 
     private Mono<Void> handleUnauthorized(ServerWebExchange exchange) {
-        String loginUrl = buildLoginUrl(exchange);
+        String path = exchange.getRequest().getURI().getPath();
+        String query = exchange.getRequest().getURI().getRawQuery();
+        String returnUrl = path + (query != null ? "?" + query : "");
+        String clientId = resolveClientId(path);
+        String loginUrl = loginUrlBuilder.build(clientId, returnUrl, exchange);
 
         if (isHtmlNavigation(exchange)) {
             exchange.getResponse().setStatusCode(HttpStatus.FOUND);
@@ -222,34 +224,11 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         return exchange.getResponse().setComplete();
     }
 
-    // axios는 Accept: application/json, text/plain, */* 를 보내므로
-    // application/json 이 명시되면 API 요청으로 판단하여 401을 반환한다.
-    // 브라우저 직접 진입은 Accept: text/html,... 이고 application/json 이 없다.
     private boolean isHtmlNavigation(ServerWebExchange exchange) {
         String accept = exchange.getRequest().getHeaders().getFirst(HttpHeaders.ACCEPT);
         if (accept == null || accept.isBlank()) return false;
         if (accept.contains("application/json")) return false;
         return accept.contains("text/html");
-    }
-
-    private String buildLoginUrl(ServerWebExchange exchange) {
-        String path = exchange.getRequest().getURI().getPath();
-        String query = exchange.getRequest().getURI().getRawQuery();
-        String returnUrl = path + (query != null ? "?" + query : "");
-
-        String clientId = resolveClientId(path);
-        String state = stateService.generate(clientId, returnUrl);
-
-        exchange.getResponse().addCookie(buildCookie("oauth_state", state, 300));
-
-        String redirectUri = gatewayProperties.baseUrl() + "/callback/" + clientId;
-
-        return keycloakProperties.authEndpoint()
-                + "?response_type=code"
-                + "&client_id=" + encode(clientId)
-                + "&redirect_uri=" + encode(redirectUri)
-                + "&scope=" + encode("openid profile email")
-                + "&state=" + encode(state);
     }
 
     private String resolveClientId(String path) {
@@ -268,23 +247,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         throw new IllegalStateException("No client configured");
     }
 
-    private ResponseCookie buildCookie(String name, String value, int maxAgeSeconds) {
-        return ResponseCookie.from(name, value)
-                .httpOnly(true)
-                .secure(secure)
-                .sameSite(sameSite)
-                .path("/")
-                .maxAge(Duration.ofSeconds(maxAgeSeconds))
-                .build();
-    }
-
     private String extractCookieValue(ServerWebExchange exchange, String cookieName) {
         var cookie = exchange.getRequest().getCookies().getFirst(cookieName);
         return (cookie != null) ? cookie.getValue() : null;
-    }
-
-    private String encode(String value) {
-        return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 
     @SuppressWarnings("unchecked")

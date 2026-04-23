@@ -1,12 +1,12 @@
 package com.hubilon.gateway.controller;
 
 import com.hubilon.gateway.config.KeycloakProperties;
+import com.hubilon.gateway.security.LoginUrlBuilder;
+import com.hubilon.gateway.util.CookieHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,54 +18,51 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/logout")
+@RequestMapping("/api/logout")
 public class LogoutController {
 
     private static final Logger log = LoggerFactory.getLogger(LogoutController.class);
 
     private final KeycloakProperties keycloakProperties;
+    private final CookieHelper cookieHelper;
+    private final LoginUrlBuilder loginUrlBuilder;
     private final WebClient webClient;
-
-    @Value("${cookie.same-site:Lax}")
-    private String sameSite;
-
-    @Value("${cookie.secure:false}")
-    private boolean secure;
 
     public LogoutController(
             KeycloakProperties keycloakProperties,
+            CookieHelper cookieHelper,
+            LoginUrlBuilder loginUrlBuilder,
             WebClient.Builder webClientBuilder) {
         this.keycloakProperties = keycloakProperties;
+        this.cookieHelper = cookieHelper;
+        this.loginUrlBuilder = loginUrlBuilder;
         this.webClient = webClientBuilder.build();
     }
 
     @PostMapping
-    public Mono<Void> logout(ServerWebExchange exchange) {
-        String refreshToken = null;
+    public Mono<ResponseEntity<Map<String, String>>> logout(ServerWebExchange exchange) {
         var refreshCookie = exchange.getRequest().getCookies().getFirst("refresh_token");
-        if (refreshCookie != null) {
-            refreshToken = refreshCookie.getValue();
-        }
+        String refreshToken = (refreshCookie != null) ? refreshCookie.getValue() : null;
 
-        exchange.getResponse().addCookie(deleteCookie("access_token"));
-        exchange.getResponse().addCookie(deleteCookie("refresh_token"));
-
-        if (refreshToken == null || refreshToken.isBlank()) {
-            exchange.getResponse().setStatusCode(HttpStatus.OK);
-            return exchange.getResponse().setComplete();
-        }
+        exchange.getResponse().addCookie(cookieHelper.deleteCookie("access_token"));
+        exchange.getResponse().addCookie(cookieHelper.deleteCookie("refresh_token"));
 
         String clientId = keycloakProperties.clients().keySet().iterator().next();
+
+        if (refreshToken == null || refreshToken.isBlank()) {
+            String loginUrl = loginUrlBuilder.build(clientId, "/", exchange);
+            return Mono.just(ResponseEntity.ok(Map.of("loginUrl", loginUrl)));
+        }
+
         KeycloakProperties.ClientConfig clientConfig = keycloakProperties.clients().get(clientId);
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("client_id", clientId);
         formData.add("client_secret", clientConfig.secret());
         formData.add("refresh_token", refreshToken);
-
-        final String finalRefreshToken = refreshToken;
 
         return webClient.post()
                 .uri(keycloakProperties.logoutEndpoint())
@@ -76,28 +73,15 @@ public class LogoutController {
                         res -> Mono.error(new RuntimeException("Keycloak logout failed with status: " + res.statusCode())))
                 .toBodilessEntity()
                 .timeout(Duration.ofSeconds(5))
-                .then(Mono.fromRunnable(() ->
-                        log.info("[Logout] Keycloak session terminated — clientId={}", clientId)
-                ))
                 .then(Mono.defer(() -> {
-                    exchange.getResponse().setStatusCode(HttpStatus.OK);
-                    return exchange.getResponse().setComplete();
+                    log.info("[Logout] Keycloak session terminated — clientId={}", clientId);
+                    String loginUrl = loginUrlBuilder.build(clientId, "/", exchange);
+                    return Mono.just(ResponseEntity.ok(Map.of("loginUrl", loginUrl)));
                 }))
                 .onErrorResume(e -> {
                     log.warn("[Logout] Keycloak logout failed — reason={}", e.getMessage());
-                    exchange.getResponse().getHeaders().set("X-Logout-Warning", "keycloak-session-not-terminated");
-                    exchange.getResponse().setStatusCode(HttpStatus.OK);
-                    return exchange.getResponse().setComplete();
+                    String loginUrl = loginUrlBuilder.build(clientId, "/", exchange) + "&prompt=login";
+                    return Mono.just(ResponseEntity.ok(Map.of("loginUrl", loginUrl)));
                 });
-    }
-
-    private ResponseCookie deleteCookie(String name) {
-        return ResponseCookie.from(name, "")
-                .httpOnly(true)
-                .secure(secure)
-                .sameSite(sameSite)
-                .path("/")
-                .maxAge(Duration.ZERO)
-                .build();
     }
 }

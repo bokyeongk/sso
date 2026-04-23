@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { authStore } from '../store/authStore'
-import apiClient from '../lib/apiClient'
+import apiClient, { isSafeRedirectUrl } from '../lib/apiClient'
 
 export function useAuth() {
   const { isAuthenticated, user } = useSyncExternalStore(
@@ -10,11 +10,18 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await apiClient.post('/logout')
+      const res = await apiClient.post<{ loginUrl: string }>('/api/logout')
+      authStore.setAuthenticated(false)
+      const loginUrl = res.data?.loginUrl
+      if (loginUrl && isSafeRedirectUrl(loginUrl)) {
+        window.location.href = loginUrl
+      } else {
+        window.location.href = '/'
+      }
     } catch {
-      // 로그아웃 실패해도 로컬 상태는 정리
+      authStore.setAuthenticated(false)
+      window.location.href = '/'
     }
-    authStore.setAuthenticated(false)
   }
 
   return {

@@ -20,7 +20,8 @@
       "Bash(gradle --version)",
       "Bash(./gradlew build *)",
       "Bash(cmd /c \"gradlew.bat build -x test 2>&1\")",
-      "Bash(powershell -Command \"& './gradlew' build -x test\")"
+      "Bash(powershell -Command \"& './gradlew' build -x test\")",
+      "Bash(cmd.exe /c \"gradlew.bat compileJava\")"
     ]
   }
 }
