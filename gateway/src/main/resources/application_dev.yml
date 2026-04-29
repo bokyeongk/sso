@@ -33,11 +33,19 @@ keycloak:
     sso-index-web:
       secret: ${KEYCLOAK_SSO_SECRET:change-me}
       service-redirect-url: ${SSO_FRONTEND_URL:http://localhost:5173}
+    git-digest-web:
+      secret: ${KEYCLOAK_GIT_SECRET:change-me}
+      service-redirect-url: ${GIT_FRONTEND_URL:http://localhost:5174}
+    test-web:
+      secret: ${KEYCLOAK_TEST_SECRET:change-me}
+      service-redirect-url: ${TEST_FRONTEND_URL:http://localhost:3000}
 
 gateway:
   base-url: ${GATEWAY_BASE_URL:http://localhost:8000}
   path-to-client-id:
     "[/api/sso/**]": sso-index-web
+    "[/api/sjeasy/**]": git-digest-web
+    "[/api/test/**]": test-web
   allowed-redirect-domains:
     - localhost:5173
     - localhost:5174

@@ -30,3 +30,28 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+keycloak:
+  server-url: http://192.168.10.30:8080
+  realm: hubilon_pd
+#  realm: hubilon_pd_dev
+  client-id: sso-index-web
+  client-secret: zOKxWwXe6jzBVVJTX0CJrQ0zKbLjZ6ib
+#  client-secret: xCpvn8iXbSDBocr5xb7Jgf9hMyirnaeL
+  secure-cookie: true                       # 로컬 HTTP 개발 시 false
+  redirect-uri: http://localhost:8080/auth/callback          # 콜백 URL (각 서비스마다 다르게)
+#  redirect-uri: http://192.168.10.30:8088/auth/callback          # 콜백 URL (각 서비스마다 다르게)
+  post-login-redirect-uri: http://localhost:5173               # 로그인 후 이동 경로
+  post-logout-redirect-uri: http://localhost:5173  # 로그아웃 후 이동할 URL
+#  post-logout-redirect-uri: http://192.168.10.30:8088/auth/login  # 로그아웃 후 이동할 URL
+  scope: openid profile email                             # 기본값, 생략 가능
+  permit-all-paths:
+    - /auth/logout
+    - /auth/login       # 로그인 시작 (인증 불필요)
+    - /auth/callback    # Keycloak 콜백 (인증 불필요)
+    - /public/**
+    - /health
+    - /actuator/**
+    - /api-docs/**       # API 문서 (인증 불필요)
+    - /swagger-ui/**    # Swagger UI (인증 불필요)
+    - /swagger-ui.html     # Swagger UI 메인 페이지 (인증 불필요)

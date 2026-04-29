@@ -10,7 +10,7 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      const res = await apiClient.post<{ loginUrl: string }>('/api/logout')
+      const res = await apiClient.post<{ loginUrl: string }>('/auth/logout')
       authStore.setAuthenticated(false)
       const loginUrl = res.data?.loginUrl
       if (loginUrl && isSafeRedirectUrl(loginUrl)) {

@@ -1,11 +1,23 @@
+import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useServices } from '../hooks/useServices'
 import { ServiceCard } from '../components/service/ServiceCard'
 import { ServiceEmptyState } from '../components/service/ServiceEmptyState'
+import apiClient from '../lib/apiClient'
 
 export function HomePage() {
   const { user, logout } = useAuth()
   const { data: services, isLoading, isError } = useServices()
+  const [testResult, setTestResult] = useState<string | null>(null)
+
+  const handleTestApi = async () => {
+    try {
+      const res = await apiClient.get('/api/services')
+      setTestResult(JSON.stringify(res.data, null, 2))
+    } catch (err: any) {
+      setTestResult(`Error: ${err?.response?.status} ${err?.message}`)
+    }
+  }
 
   return (
     <div className="home-page">
@@ -20,8 +32,17 @@ export function HomePage() {
           <button className="logout-btn" onClick={logout}>
             로그아웃
           </button>
+          <button className="logout-btn" onClick={handleTestApi}>
+            API 테스트
+          </button>
         </div>
       </header>
+
+      {testResult !== null && (
+        <pre style={{ padding: '1rem', background: '#f4f4f4', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+          {testResult}
+        </pre>
+      )}
 
       <main className="home-main">
         <h2 className="service-list-title">서비스 목록</h2>

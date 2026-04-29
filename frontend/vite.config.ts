@@ -6,14 +6,13 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api/logout': {
-        target: 'http://localhost:8000',
+      '/auth': {
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8080',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api/sso'),
       },
     },
   },
