@@ -46,9 +46,9 @@ keycloak:
 #  post-logout-redirect-uri: http://192.168.10.30:8088/auth/login  # 로그아웃 후 이동할 URL
   scope: openid profile email                             # 기본값, 생략 가능
   permit-all-paths:
-    - /auth/logout
     - /auth/login       # 로그인 시작 (인증 불필요)
     - /auth/callback    # Keycloak 콜백 (인증 불필요)
+    - /auth/logout
     - /public/**
     - /health
     - /actuator/**
