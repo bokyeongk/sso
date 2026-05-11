@@ -2,6 +2,7 @@ import { FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import apiClient from '../lib/apiClient'
 import { POSITION_OPTIONS, TEAM_OPTIONS } from '../constants/options'
+import { useRsaEncrypt } from '../hooks/useRsaEncrypt'
 
 interface FieldErrors {
   username?: string
@@ -29,6 +30,8 @@ export function RegisterPage() {
   const [serverError, setServerError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+
+  const { encrypt, invalidate } = useRsaEncrypt()
 
   const [usernameChecked, setUsernameChecked] = useState(false)
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null)
@@ -136,23 +139,35 @@ export function RegisterPage() {
     if (!validate()) return
 
     setLoading(true)
+
+    const attemptRegister = async (retried = false): Promise<void> => {
+      try {
+        const encryptedPassword = await encrypt(password)
+        await apiClient.post('/api/v1/auth/register', {
+          username,
+          password: encryptedPassword,
+          lastName,
+          firstName,
+          email,
+          attributes: {
+            rank: position,
+            teamId: team,
+            telNo: phone,
+          },
+        })
+        navigate('/login', { state: { registered: true } })
+      } catch (err: any) {
+        const msg = err?.response?.data?.message
+        if (!retried && msg === '비밀번호 복호화에 실패했습니다.') {
+          invalidate()
+          return attemptRegister(true)
+        }
+        setServerError(msg ?? '회원가입 처리 중 오류가 발생했습니다.')
+      }
+    }
+
     try {
-      await apiClient.post('/api/v1/auth/register', {
-        username,
-        password,
-        lastName,
-        firstName,
-        email,
-        attributes: {
-          rank: position,
-          teamId: team,
-          telNo: phone,
-        },
-      })
-      navigate('/login', { state: { registered: true } })
-    } catch (err: any) {
-      const msg = err?.response?.data?.message
-      setServerError(msg ?? '회원가입 중 오류가 발생했습니다. 다시 시도해 주세요.')
+      await attemptRegister()
     } finally {
       setLoading(false)
     }

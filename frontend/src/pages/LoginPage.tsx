@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import apiClient from '../lib/apiClient'
 import { authStore } from '../store/authStore'
 import { authFlag } from '../hooks/useAuthInit'
+import { useRsaEncrypt } from '../hooks/useRsaEncrypt'
 
 export function LoginPage() {
   const [username, setUsername] = useState('')
@@ -12,22 +13,36 @@ export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const registered = location.state?.registered === true
+  const { encrypt, invalidate } = useRsaEncrypt()
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
     setLoading(true)
+
+    const attemptLogin = async (retried = false): Promise<void> => {
+      try {
+        const encryptedPassword = await encrypt(password)
+        await apiClient.post('/api/v1/auth/login', { username, password: encryptedPassword })
+        const { data } = await apiClient.get('/api/me')
+        authFlag.set()
+        authStore.setAuthenticated(true, {
+          name: data.name ?? data.preferredUsername ?? data.preferred_username ?? '',
+          email: data.email ?? '',
+        })
+        navigate('/')
+      } catch (err: any) {
+        const msg = err?.response?.data?.message
+        if (!retried && msg === '비밀번호 복호화에 실패했습니다.') {
+          invalidate()
+          return attemptLogin(true)
+        }
+        setError(msg ?? '로그인 처리 중 오류가 발생했습니다.')
+      }
+    }
+
     try {
-      await apiClient.post('/api/v1/auth/login', { username, password })
-      const { data } = await apiClient.get('/api/me')
-      authFlag.set()
-      authStore.setAuthenticated(true, {
-        name: data.name ?? data.preferredUsername ?? data.preferred_username ?? '',
-        email: data.email ?? '',
-      })
-      navigate('/')
-    } catch {
-      setError('아이디 또는 비밀번호가 올바르지 않습니다.')
+      await attemptLogin()
     } finally {
       setLoading(false)
     }
