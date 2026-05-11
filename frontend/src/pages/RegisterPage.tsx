@@ -66,7 +66,7 @@ export function RegisterPage() {
   const checkUsername = async () => {
     setUsernameChecking(true)
     try {
-      const { data } = await apiClient.get('/api/v1/auth/check-username', { params: { username } })
+      const { data } = await apiClient.get('/auth/check-username', { params: { username } })
       setUsernameAvailable(!data.exists)
     } catch {
       setUsernameAvailable(null)
@@ -79,7 +79,7 @@ export function RegisterPage() {
   const checkEmail = async () => {
     setEmailChecking(true)
     try {
-      const { data } = await apiClient.get('/api/v1/auth/check-email', { params: { email } })
+      const { data } = await apiClient.get('/auth/check-email', { params: { email } })
       setEmailAvailable(!data.exists)
     } catch {
       setEmailAvailable(null)

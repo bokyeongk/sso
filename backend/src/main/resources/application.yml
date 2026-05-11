@@ -4,7 +4,7 @@ spring:
   application:
     name: sso-backend
   datasource:
-    url: jdbc:postgresql://192.168.10.30:6543/hubilon_pd
+    url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -19,7 +19,7 @@ spring:
         default_schema: msa-service
 
 allowed:
-  origin: ${ALLOWED_ORIGIN:http://localhost:5173}
+  origin: ${ALLOWED_ORIGIN}
 
 server:
   port: 8080
@@ -32,21 +32,16 @@ springdoc:
     path: /swagger-ui.html
 
 keycloak:
-  server-url: http://192.168.10.30:8080
+  server-url: ${KEYCLOAK_URL}
   realm: hubilon_pd
   client-id: sso-index-web
   client-secret: ${KEYCLOAK_CLIENT_SECRET}
-  oauth-state-cookie: sso-oauth-state
-  session-id-token-key: sso-id-token
   secure-cookie: true                       # 로컬 HTTP 개발 시 false
-  redirect-uri: http://localhost:8080/auth/callback          # 콜백 URL (각 서비스마다 다르게)
-  post-login-redirect-uri: http://localhost:5173               # 로그인 후 이동 경로
-  post-logout-redirect-uri: http://localhost:5173/login  # 로그아웃 후 이동할 URL
+  redirect-uri: ${KEYCLOAK_REDIRECT_URI}          # 콜백 URL (각 서비스마다 다르게)
+  post-login-redirect-uri: ${KEYCLOAK_POST_LOGIN_REDIRECT_URI}               # 로그인 후 이동 경로
+  post-logout-redirect-uri: ${KEYCLOAK_POST_LOGOUT_REDIRECT_URI}  # 로그아웃 후 이동할 URL
   auth-controller:
     enabled: true
-  uri:
-    check-username: /api/v1/auth/check-username
-    check-email: /api/v1/auth/check-email
   permit-all-paths:
     - /public/**
     - /health
@@ -56,7 +51,5 @@ keycloak:
     - /swagger-ui.html
     - /api/v1/auth/login
     - /api/v1/auth/register
-    - /api/v1/auth/check-username
-    - /api/v1/auth/check-email
     - /api/v1/auth/public-key
 
