@@ -21,15 +21,7 @@ configurations {
 
 repositories {
     mavenCentral()
-    maven {
-        name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/bokyeongk/common-auth-lib")
-        credentials {
-            username = "bokyeongk"
-            password = "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"
-
-        }
-    }
+//    maven {
 }
 
 dependencies {
@@ -39,7 +31,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
-    implementation("com.mycompany:common-auth-lib:1.0.3")
+    /* 1.0.6 회원가입 추가 */
+    /* 1.0.7 아이디/이메일 조회(중복확인) 추가 */
+    /* 1.0.7 로그인 및 회원가입 메소드화 */
+    implementation(files("libs/common-auth-lib-1.0.8.jar"))
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+
 
     runtimeOnly("org.postgresql:postgresql")
 

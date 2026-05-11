@@ -5,11 +5,13 @@ interface AuthUser {
 
 interface AuthState {
   isAuthenticated: boolean
+  isLoading: boolean
   user: AuthUser | null
 }
 
-const state: AuthState = {
+let state: AuthState = {
   isAuthenticated: false,
+  isLoading: true,
   user: null,
 }
 
@@ -22,8 +24,11 @@ function notify() {
 export const authStore = {
   getState: () => state,
   setAuthenticated(isAuth: boolean, user?: { name: string; email: string }) {
-    state.isAuthenticated = isAuth
-    state.user = isAuth && user ? user : null
+    state = {
+      isAuthenticated: isAuth,
+      isLoading: false,
+      user: isAuth && user ? user : null,
+    }
     notify()
   },
   subscribe(fn: () => void) {

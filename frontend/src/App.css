@@ -77,10 +77,173 @@
   }
 }
 
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.login-input {
+  width: 100%;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: var(--text-h);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: #94A3B8;
+  }
+
+  &:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-bg);
+  }
+}
+
+.login-error {
+  font-size: 13px;
+  color: #B91C1C;
+  margin: 0;
+}
+
+.login-signup {
+  font-size: 13px;
+  color: var(--text);
+  text-align: center;
+  margin: 0;
+}
+
+.login-signup-link {
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .auth-loading {
   font-size: 14px;
   color: #64748B;
   text-align: center;
+}
+
+/* ── Auth 공통 (RegisterPage용) ──────────────────────── */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #F8F9FA;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.auth-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  padding: 48px;
+  width: 420px;
+  max-width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  border: 1px solid var(--border);
+}
+
+.auth-select {
+  width: 100%;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: var(--text-h);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-bg);
+  }
+}
+
+.auth-field-error {
+  font-size: 12px;
+  color: #B91C1C;
+  margin: 2px 0 0;
+}
+
+.auth-success {
+  font-size: 13px;
+  color: #15803D;
+  background: #DCFCE7;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin: 0;
+}
+
+.input-check-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.input-check-row .login-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.check-btn {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #2563EB;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: #DBEAFE;
+  }
+
+  &:disabled {
+    color: #94A3B8;
+    background: #F8FAFC;
+    border-color: #E2E8F0;
+    cursor: not-allowed;
+  }
+}
+
+.check-available {
+  font-size: 12px;
+  color: #15803D;
+  margin: 2px 0 0;
 }
 
 /* ── Home Page ───────────────────────────────────────── */

@@ -21,7 +21,19 @@
       "Bash(./gradlew build *)",
       "Bash(cmd /c \"gradlew.bat build -x test 2>&1\")",
       "Bash(powershell -Command \"& './gradlew' build -x test\")",
-      "Bash(cmd.exe /c \"gradlew.bat compileJava\")"
+      "Bash(cmd.exe /c \"gradlew.bat compileJava\")",
+      "Bash(javap -p -c backend/libs/common-auth-lib-1.0.5.jar com/hubilon/auth/SecurityConfig.class)",
+      "Bash(jar xf *)",
+      "Bash(javap -p com/hubilon/auth/SecurityConfig.class)",
+      "Bash(javap -p com/hubilon/auth/KeycloakAuthController.class)",
+      "Bash(javap -p com/hubilon/auth/KeycloakTokenFilter.class)",
+      "Bash(javap -p com/hubilon/auth/KeycloakProperties.class)",
+      "Bash(jar tf *)",
+      "Bash(javap -p -cp libs/common-auth-lib-1.0.8.jar com.hubilon.auth.KeycloakAuthService)",
+      "Bash(javap -p -cp libs/common-auth-lib-1.0.8.jar com.hubilon.auth.LoginRequest com.hubilon.auth.RegisterRequest com.hubilon.auth.LoginResponse)",
+      "Bash(javap -p -cp libs/common-auth-lib-1.0.8.jar com.hubilon.auth.DuplicateCheckResponse com.hubilon.auth.KeycloakAuthController)",
+      "Bash(javap -p -cp libs/common-auth-lib-1.0.8.jar com.hubilon.auth.KeycloakClient)",
+      "Bash(javap -verbose -cp libs/common-auth-lib-1.0.8.jar com.hubilon.auth.KeycloakAuthController)"
     ]
   }
 }
