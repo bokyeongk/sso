@@ -1,0 +1,30 @@
+services:
+  sso-backend:
+    build:
+      context: ./backend
+    container_name: sso-backend
+    ports:
+      - "8087:8087"
+    environment:
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      KEYCLOAK_URL: ${KEYCLOAK_URL}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+      KEYCLOAK_REDIRECT_URI: ${KEYCLOAK_REDIRECT_URI}
+      KEYCLOAK_POST_LOGIN_REDIRECT_URI: ${KEYCLOAK_POST_LOGIN_REDIRECT_URI}
+      KEYCLOAK_POST_LOGOUT_REDIRECT_URI: ${KEYCLOAK_POST_LOGOUT_REDIRECT_URI}
+      ALLOWED_ORIGIN: ${ALLOWED_ORIGIN}
+    restart: unless-stopped
+
+  sso-frontend:
+    build:
+      context: ./frontend
+    container_name: sso-frontend
+    ports:
+      - "4001:4001"
+    environment:
+      BACKEND_URL: http://192.168.10.30:8087
+    depends_on:
+      - sso-backend
+    restart: unless-stopped
