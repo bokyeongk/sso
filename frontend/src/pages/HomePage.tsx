@@ -1,6 +1,5 @@
 import { useAuth } from '../hooks/useAuth'
 import { useServices } from '../hooks/useServices'
-import { useApiMe } from '../hooks/useApiTest'
 import { ServiceCard } from '../components/service/ServiceCard'
 import { ServiceEmptyState } from '../components/service/ServiceEmptyState'
 

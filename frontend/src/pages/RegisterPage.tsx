@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import apiClient from '../lib/apiClient'
 import { POSITION_OPTIONS, TEAM_OPTIONS } from '../constants/options'
@@ -132,7 +132,7 @@ export function RegisterPage() {
     return Object.keys(errors).length === 0
   }
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault()
     setServerError(null)
 

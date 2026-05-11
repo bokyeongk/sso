@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import apiClient from '../lib/apiClient'
 import { authStore } from '../store/authStore'
@@ -15,7 +15,7 @@ export function LoginPage() {
   const registered = location.state?.registered === true
   const { encrypt, invalidate } = useRsaEncrypt()
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault()
     setError(null)
     setLoading(true)

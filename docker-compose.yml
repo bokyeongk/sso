@@ -24,7 +24,7 @@ services:
     ports:
       - "4001:4001"
     environment:
-      BACKEND_URL: http://192.168.10.30:8087
+      BACKEND_URL: http://sso-backend:8087
     depends_on:
       - sso-backend
     restart: unless-stopped
