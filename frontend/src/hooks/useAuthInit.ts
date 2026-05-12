@@ -12,14 +12,10 @@ export const authFlag = {
 
 export function useAuthInit() {
   useEffect(() => {
-    if (!authFlag.exists()) {
-      authStore.setAuthenticated(false)
-      return
-    }
-
     apiClient.get('/api/me')
       .then(res => {
         const d = res.data
+        authFlag.set()
         authStore.setAuthenticated(true, {
           name: d.name ?? d.preferredUsername ?? d.preferred_username ?? '',
           email: d.email ?? '',

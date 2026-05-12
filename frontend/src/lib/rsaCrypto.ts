@@ -1,24 +1,30 @@
+import * as forge from 'node-forge'
 import apiClient from './apiClient'
 
-export async function importPublicKey(base64: string): Promise<CryptoKey> {
-  const binaryDer = Uint8Array.from(atob(base64), c => c.charCodeAt(0))
-  return crypto.subtle.importKey(
-    'spki',
-    binaryDer,
-    { name: 'RSA-OAEP', hash: 'SHA-256' },
-    false,
-    ['encrypt']
+function encryptWithForge(publicKeyBase64: string, plaintext: string): string {
+  const derBytes = forge.util.decode64(publicKeyBase64)
+  const asn1Obj = forge.asn1.fromDer(derBytes)
+  const publicKey = forge.pki.publicKeyFromAsn1(asn1Obj) as forge.pki.rsa.PublicKey
+  const encrypted = publicKey.encrypt(
+    forge.util.encodeUtf8(plaintext),
+    'RSA-OAEP',
+    {
+      md: forge.md.sha256.create(),
+      mgf1: { md: forge.md.sha256.create() },
+    }
   )
+  return forge.util.encode64(encrypted)
 }
 
-export async function encryptWithPublicKey(publicKey: CryptoKey, plaintext: string): Promise<string> {
+export async function encryptWithPublicKey(publicKeyBase64: string, plaintext: string): Promise<string> {
   if (!plaintext) throw new Error('plaintext must not be empty')
-  const encoded = new TextEncoder().encode(plaintext)
-  const encrypted = await crypto.subtle.encrypt({ name: 'RSA-OAEP' }, publicKey, encoded)
-  return btoa(Array.from(new Uint8Array(encrypted), b => String.fromCharCode(b)).join(''))
+  // if(crypto?.subtle){
+  //   return encryptWithSubtle(publicKeyBase64, plaintext)
+  // }
+  return encryptWithForge(publicKeyBase64, plaintext)
 }
 
-export async function fetchAndImportPublicKey(): Promise<CryptoKey> {
+export async function fetchPublicKeyBase64(): Promise<string> {
   const { data } = await apiClient.get('/api/v1/auth/public-key')
-  return importPublicKey(data.publicKey)
+  return data.publicKey
 }

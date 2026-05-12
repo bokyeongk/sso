@@ -1,11 +1,11 @@
-import { fetchAndImportPublicKey, encryptWithPublicKey } from '../lib/rsaCrypto'
+import { fetchPublicKeyBase64, encryptWithPublicKey } from '../lib/rsaCrypto'
 
-let cachedKey: CryptoKey | null = null
+let cachedKey: string | null = null
 
 export function useRsaEncrypt() {
   const encrypt = async (plaintext: string): Promise<string> => {
     if (!cachedKey) {
-      cachedKey = await fetchAndImportPublicKey()
+      cachedKey = await fetchPublicKeyBase64()
     }
     return encryptWithPublicKey(cachedKey, plaintext)
   }

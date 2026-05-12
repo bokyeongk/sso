@@ -34,7 +34,10 @@ dependencies {
     /* 1.0.6 회원가입 추가 */
     /* 1.0.7 아이디/이메일 조회(중복확인) 추가 */
     /* 1.0.8 로그인 및 회원가입 메소드화 */
-    implementation(files("libs/common-auth-lib-1.0.8.jar"))
+    /* 1.0.9 에러로그 추가 */
+    /* 1.0.10 dynamic scope */
+    /* 1.0.11 user 조회 method 추가 */
+    implementation(files("libs/common-auth-lib-1.0.11.jar"))
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-security")
 

@@ -34,12 +34,14 @@ springdoc:
 keycloak:
   server-url: ${KEYCLOAK_URL}
   realm: hubilon_pd
-  client-id: sso-index-web
+  client-id: ${KEYCLOAK_CLIENT_ID}
   client-secret: ${KEYCLOAK_CLIENT_SECRET}
-  secure-cookie: true                       # 로컬 HTTP 개발 시 false
+  secure-cookie: false                      # 로컬 HTTP 개발 시 false, HTTPS 배포 시 true
   redirect-uri: ${KEYCLOAK_REDIRECT_URI}          # 콜백 URL (각 서비스마다 다르게)
   post-login-redirect-uri: ${KEYCLOAK_POST_LOGIN_REDIRECT_URI}               # 로그인 후 이동 경로
   post-logout-redirect-uri: ${KEYCLOAK_POST_LOGOUT_REDIRECT_URI}  # 로그아웃 후 이동할 URL
+  additional-scopes: # openid, profile은 자동 포함
+    - email                 # 기본값 (생략 가능)
   auth-controller:
     enabled: true
   permit-all-paths:
