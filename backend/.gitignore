@@ -6,7 +6,8 @@ build/
 # Spring Boot
 *.jar
 *.war
-!libs/*.jar
+#!libs/*.jar
+plan/*.md
 
 # Logs
 logs/

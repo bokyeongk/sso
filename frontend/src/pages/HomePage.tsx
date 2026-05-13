@@ -44,7 +44,7 @@ export function HomePage() {
             {isAdmin && (
               <>
                 <button className="edit-mode-btn" onClick={() => setIsEditMode(v => !v)}>
-                  {isEditMode ? '완료' : '편집'}
+                  {isEditMode ? '편집 종료' : '편집 모드'}
                 </button>
                 {isEditMode && (
                   <button className="add-service-btn" onClick={() => setShowCreateModal(true)}>

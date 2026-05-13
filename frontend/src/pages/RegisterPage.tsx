@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import apiClient from '../lib/apiClient'
-import { POSITION_OPTIONS, TEAM_OPTIONS } from '../constants/options'
 import { useRsaEncrypt } from '../hooks/useRsaEncrypt'
 
 interface FieldErrors {
@@ -11,24 +10,40 @@ interface FieldErrors {
   email?: string
   password?: string
   confirmPassword?: string
-  position?: string
-  team?: string
   phone?: string
 }
+
+const EMAIL_LOCAL_PATTERN = /^[a-zA-Z0-9._+\-]+$/
+
+const DOMAIN_OPTIONS = [
+  { value: 'naver.com',   label: 'naver.com' },
+  { value: 'gmail.com',   label: 'gmail.com' },
+  { value: 'kakao.com',   label: 'kakao.com' },
+  { value: 'hubilon.com', label: 'hubilon.com' },
+  { value: 'custom',      label: '직접입력' },
+]
+
+const pwRules = [
+  { key: 'length', label: '8자 이상',  test: (pw: string) => pw.length >= 8 },
+  { key: 'letter', label: '영문 포함', test: (pw: string) => /[A-Za-z]/.test(pw) },
+  { key: 'number', label: '숫자 포함', test: (pw: string) => /\d/.test(pw) },
+]
 
 export function RegisterPage() {
   const [username, setUsername] = useState('')
   const [lastName, setLastName] = useState('')
   const [firstName, setFirstName] = useState('')
-  const [email, setEmail] = useState('')
+  const [emailLocal, setEmailLocal] = useState('')
+  const [emailDomain, setEmailDomain] = useState('naver.com')
+  const [customDomain, setCustomDomain] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [position, setPosition] = useState('')
-  const [team, setTeam] = useState('')
   const [phone, setPhone] = useState('')
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [serverError, setServerError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [passwordTouched, setPasswordTouched] = useState(false)
+  const [confirmTouched, setConfirmTouched] = useState(false)
   const navigate = useNavigate()
 
   const { encrypt, invalidate } = useRsaEncrypt()
@@ -39,6 +54,10 @@ export function RegisterPage() {
   const [emailChecked, setEmailChecked] = useState(false)
   const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null)
   const [emailChecking, setEmailChecking] = useState(false)
+
+  const email = emailLocal
+    ? `${emailLocal}@${emailDomain === 'custom' ? customDomain : emailDomain}`
+    : ''
 
   const formatPhone = (value: string): string => {
     const digits = value.replace(/\D/g, '')
@@ -57,10 +76,30 @@ export function RegisterPage() {
     setUsernameAvailable(null)
   }
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value)
+  const resetEmailCheck = () => {
     setEmailChecked(false)
     setEmailAvailable(null)
+    setFieldErrors(prev => ({ ...prev, email: undefined }))
+  }
+
+  const handleEmailLocalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmailLocal(e.target.value)
+    resetEmailCheck()
+  }
+
+  const handleEmailDomainChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setEmailDomain(e.target.value)
+    resetEmailCheck()
+  }
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value)
+    setPasswordTouched(true)
+  }
+
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setConfirmPassword(e.target.value)
+    setConfirmTouched(true)
   }
 
   const checkUsername = async () => {
@@ -105,7 +144,13 @@ export function RegisterPage() {
     if (!firstName.trim()) {
       errors.firstName = '이름을 입력해 주세요.'
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!emailLocal) {
+      errors.email = '이메일을 입력해 주세요.'
+    } else if (!EMAIL_LOCAL_PATTERN.test(emailLocal)) {
+      errors.email = '이메일 아이디에 사용할 수 없는 문자가 포함되어 있습니다.'
+    } else if (emailDomain === 'custom' && !/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(customDomain)) {
+      errors.email = '올바른 도메인 형식을 입력해 주세요. (예: example.com)'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       errors.email = '올바른 이메일 주소를 입력해 주세요.'
     } else if (!emailChecked) {
       errors.email = '이메일 중복 확인을 해주세요.'
@@ -117,12 +162,6 @@ export function RegisterPage() {
     }
     if (password !== confirmPassword) {
       errors.confirmPassword = '비밀번호가 일치하지 않습니다.'
-    }
-    if (!position) {
-      errors.position = '직급을 선택해 주세요.'
-    }
-    if (!team) {
-      errors.team = '팀을 선택해 주세요.'
     }
     if (!/^010-\d{4}-\d{4}$/.test(phone)) {
       errors.phone = '올바른 휴대폰번호를 입력해 주세요.'
@@ -150,8 +189,6 @@ export function RegisterPage() {
           firstName,
           email,
           attributes: {
-            rank: position,
-            teamId: team,
             telNo: phone,
           },
         })
@@ -214,58 +251,61 @@ export function RegisterPage() {
           </div>
 
           <div className="login-field">
-            <label className="login-label" htmlFor="lastName">성</label>
-            <input
-              id="lastName"
-              className="login-input"
-              type="text"
-              placeholder="성을 입력하세요"
-              value={lastName}
-              onChange={e => setLastName(e.target.value)}
-              autoComplete="family-name"
-            />
-            {fieldErrors.lastName && (
-              <p className="auth-field-error">{fieldErrors.lastName}</p>
-            )}
+            <label className="login-label">성명</label>
+            <div className="name-row">
+              <div className="name-col">
+                <input className="login-input" placeholder="성" value={lastName}
+                  onChange={e => setLastName(e.target.value)} autoComplete="family-name" />
+                {fieldErrors.lastName && <p className="auth-field-error">{fieldErrors.lastName}</p>}
+              </div>
+              <div className="name-col">
+                <input className="login-input" placeholder="이름" value={firstName}
+                  onChange={e => setFirstName(e.target.value)} autoComplete="given-name" />
+                {fieldErrors.firstName && <p className="auth-field-error">{fieldErrors.firstName}</p>}
+              </div>
+            </div>
           </div>
 
           <div className="login-field">
-            <label className="login-label" htmlFor="firstName">이름</label>
-            <input
-              id="firstName"
-              className="login-input"
-              type="text"
-              placeholder="이름을 입력하세요"
-              value={firstName}
-              onChange={e => setFirstName(e.target.value)}
-              autoComplete="given-name"
-            />
-            {fieldErrors.firstName && (
-              <p className="auth-field-error">{fieldErrors.firstName}</p>
-            )}
-          </div>
-
-          <div className="login-field">
-            <label className="login-label" htmlFor="email">이메일</label>
-            <div className="input-check-row">
+            <label className="login-label">이메일</label>
+            <div className="email-input-row">
               <input
-                id="email"
-                className="login-input"
-                type="email"
-                placeholder="이메일을 입력하세요"
-                value={email}
-                onChange={handleEmailChange}
+                className="login-input email-local-input"
+                type="text"
+                placeholder="이메일"
+                value={emailLocal}
+                onChange={handleEmailLocalChange}
                 autoComplete="email"
               />
+              <span className="email-at">@</span>
+              <select
+                className="auth-select email-domain-select"
+                value={emailDomain}
+                onChange={handleEmailDomainChange}
+              >
+                {DOMAIN_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
               <button
                 type="button"
-                className="check-btn"
+                className="check-btn email-check-btn"
                 onClick={checkEmail}
                 disabled={emailChecking || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)}
               >
                 {emailChecking ? '확인 중...' : '중복확인'}
               </button>
             </div>
+            {emailDomain === 'custom' && (
+              <input
+                className="login-input"
+                style={{ marginTop: 6 }}
+                type="text"
+                placeholder="도메인을 입력하세요 (예: example.com)"
+                value={customDomain}
+                onChange={e => { setCustomDomain(e.target.value); resetEmailCheck() }}
+              />
+            )}
             {emailChecked && (
               <p className={emailAvailable ? 'check-available' : 'auth-field-error'}>
                 {emailAvailable ? '사용 가능한 이메일입니다.' : '이미 사용 중인 이메일입니다.'}
@@ -284,12 +324,19 @@ export function RegisterPage() {
               type="password"
               placeholder="비밀번호를 입력하세요"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={handlePasswordChange}
               autoComplete="new-password"
             />
-            {fieldErrors.password && (
-              <p className="auth-field-error">{fieldErrors.password}</p>
-            )}
+            <ul className="pw-rules">
+              {pwRules.map(rule => (
+                <li
+                  key={rule.key}
+                  className={`pw-rule${passwordTouched ? (rule.test(password) ? ' pw-rule--pass' : ' pw-rule--fail') : ''}`}
+                >
+                  {rule.label}
+                </li>
+              ))}
+            </ul>
           </div>
 
           <div className="login-field">
@@ -300,47 +347,13 @@ export function RegisterPage() {
               type="password"
               placeholder="비밀번호를 다시 입력하세요"
               value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
+              onChange={handleConfirmPasswordChange}
               autoComplete="new-password"
             />
-            {fieldErrors.confirmPassword && (
-              <p className="auth-field-error">{fieldErrors.confirmPassword}</p>
-            )}
-          </div>
-
-          <div className="login-field">
-            <label className="login-label" htmlFor="position">직급</label>
-            <select
-              id="position"
-              className="auth-select"
-              value={position}
-              onChange={e => setPosition(e.target.value)}
-            >
-              <option value="">직급을 선택하세요</option>
-              {POSITION_OPTIONS.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-            {fieldErrors.position && (
-              <p className="auth-field-error">{fieldErrors.position}</p>
-            )}
-          </div>
-
-          <div className="login-field">
-            <label className="login-label" htmlFor="team">팀</label>
-            <select
-              id="team"
-              className="auth-select"
-              value={team}
-              onChange={e => setTeam(e.target.value)}
-            >
-              <option value="">팀을 선택하세요</option>
-              {TEAM_OPTIONS.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-            {fieldErrors.team && (
-              <p className="auth-field-error">{fieldErrors.team}</p>
+            {confirmTouched && confirmPassword && (
+              <p className={password === confirmPassword ? 'check-available' : 'auth-field-error'}>
+                {password === confirmPassword ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.'}
+              </p>
             )}
           </div>
 

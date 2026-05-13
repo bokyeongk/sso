@@ -162,7 +162,7 @@
   border-radius: 12px;
   box-shadow: var(--shadow-card);
   padding: 48px;
-  width: 420px;
+  width: 540px;
   max-width: 100%;
   box-sizing: border-box;
   display: flex;
@@ -663,4 +663,87 @@
     border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-bg);
   }
+}
+
+/* ── Register: 성/이름 한 줄 ─────────────────────── */
+.name-row {
+  display: flex;
+  gap: 8px;
+}
+
+.name-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ── Register: 이메일 분리 입력 ──────────────────── */
+.email-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.email-local-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.email-at {
+  font-size: 14px;
+  color: var(--text-h);
+  flex-shrink: 0;
+}
+
+.email-domain-select {
+  flex: 1;
+  min-width: 0;
+}
+
+.email-check-btn {
+  flex-shrink: 0;
+}
+
+/* ── Register: 비밀번호 규칙 ─────────────────────── */
+.pw-rules {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pw-rule {
+  font-size: 12px;
+  color: var(--text);
+  padding-left: 14px;
+  position: relative;
+}
+
+.pw-rule::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--text);
+}
+
+.pw-rule--pass {
+  color: #15803D;
+}
+
+.pw-rule--pass::before {
+  content: '✓';
+  color: #15803D;
+}
+
+.pw-rule--fail {
+  color: #B91C1C;
+}
+
+.pw-rule--fail::before {
+  content: '✗';
+  color: #B91C1C;
 }

@@ -41,7 +41,12 @@
       "Bash(Sort-Object)",
       "Bash(Get-ChildItem -Path \"C:\\\\workspace\\\\00.base\\\\claude\\\\00.sso\\\\sso\\\\backend\" -Recurse -Directory)",
       "Bash(grep -E \"\\\\.\\(kt|java|sql|yaml|yml|properties|md\\)$\")",
-      "Bash(Get-ChildItem -Path \"C:\\\\workspace\\\\00.base\\\\claude\\\\00.sso\\\\sso\\\\backend\\\\src\\\\main\\\\java\\\\com\\\\hubilon\\\\sso\" -Recurse -File)"
+      "Bash(Get-ChildItem -Path \"C:\\\\workspace\\\\00.base\\\\claude\\\\00.sso\\\\sso\\\\backend\\\\src\\\\main\\\\java\\\\com\\\\hubilon\\\\sso\" -Recurse -File)",
+      "Bash(git checkout *)",
+      "WebSearch",
+      "Bash(./gradlew wrapper *)",
+      "Bash(Select-String -Pattern \"HibernateException|DialectFactory|dialect|Caused by|FAILED|ERROR\")",
+      "Bash(Select-Object -First 60)"
     ]
   }
 }
