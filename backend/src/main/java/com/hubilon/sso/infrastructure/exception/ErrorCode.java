@@ -13,7 +13,8 @@ public enum ErrorCode {
     FORBIDDEN("E004", "접근 권한이 없습니다"),
     NOT_FOUND("E005", "리소스를 찾을 수 없습니다"),
     AUTH_TOKEN_EXCHANGE_FAILED("E006", "토큰 교환에 실패했습니다."),
-    DECRYPTION_FAILED("E007", "비밀번호 복호화에 실패했습니다.");
+    DECRYPTION_FAILED("E007", "비밀번호 복호화에 실패했습니다."),
+    SERVICE_NOT_FOUND("E008", "서비스를 찾을 수 없습니다");
 
     private final String code;
     private final String message;

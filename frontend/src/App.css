@@ -463,3 +463,204 @@
   color: var(--text);
   margin: 0;
 }
+
+/* ── Header Left / Right ─────────────────────────── */
+.home-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-username {
+  font-size: 14px;
+  color: var(--text);
+}
+
+/* ── Edit Mode Buttons ───────────────────────────── */
+.edit-mode-btn {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: var(--accent);
+  background: #ffffff;
+  border: 1px solid var(--accent);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: var(--accent);
+    color: #ffffff;
+  }
+}
+
+.add-service-btn {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: #ffffff;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: var(--accent-hover);
+  }
+}
+
+/* ── Service Card Edit Actions ───────────────────── */
+.service-card-actions {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+}
+
+.card-edit-btn {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 0;
+  border-radius: 6px;
+  color: var(--accent);
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: #DBEAFE;
+  }
+}
+
+.card-delete-btn {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 0;
+  border-radius: 6px;
+  color: #B91C1C;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: #FEE2E2;
+  }
+}
+
+/* ── Modal ───────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.modal-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 32px;
+  width: 440px;
+  max-width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0 0 8px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.modal-cancel-btn {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: var(--text-h);
+  background: #ffffff;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: #F1F5F9;
+  }
+}
+
+.modal-submit-btn {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 20px;
+  border-radius: 8px;
+  color: #ffffff;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--accent-hover);
+  }
+
+  &:disabled {
+    background: #93C5FD;
+    cursor: not-allowed;
+  }
+}
+
+.required-mark {
+  color: #B91C1C;
+}
+
+.modal-textarea {
+  width: 100%;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: var(--text-h);
+  outline: none;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: #94A3B8;
+  }
+
+  &:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-bg);
+  }
+}

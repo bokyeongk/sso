@@ -19,6 +19,7 @@ export function useAuthInit() {
         authStore.setAuthenticated(true, {
           name: d.name ?? d.preferredUsername ?? d.preferred_username ?? '',
           email: d.email ?? '',
+          roles: Array.isArray(d.roles) ? d.roles : [],
         })
       })
       .catch(() => {

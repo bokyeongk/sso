@@ -35,7 +35,13 @@
       "Bash(javap -p -cp libs/common-auth-lib-1.0.8.jar com.hubilon.auth.KeycloakClient)",
       "Bash(javap -verbose -cp libs/common-auth-lib-1.0.8.jar com.hubilon.auth.KeycloakAuthController)",
       "Bash(Get-ChildItem -Recurse -Path \"C:\\\\workspace\\\\00.base\\\\claude\\\\00.sso\\\\sso\\\\backend\\\\src\" -Filter \"*Controller*.java\")",
-      "Bash(Select-Object FullName)"
+      "Bash(Select-Object FullName)",
+      "Bash(Get-ChildItem -Path \"C:\\\\workspace\\\\00.base\\\\claude\\\\00.sso\\\\sso\\\\frontend\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(Get-ChildItem -Path \"C:\\\\workspace\\\\00.base\\\\claude\\\\00.sso\\\\sso\\\\backend\" -Recurse -Directory)",
+      "Bash(grep -E \"\\\\.\\(kt|java|sql|yaml|yml|properties|md\\)$\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\workspace\\\\00.base\\\\claude\\\\00.sso\\\\sso\\\\backend\\\\src\\\\main\\\\java\\\\com\\\\hubilon\\\\sso\" -Recurse -File)"
     ]
   }
 }

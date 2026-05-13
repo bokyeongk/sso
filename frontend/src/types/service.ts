@@ -6,6 +6,5 @@ export interface Service {
   description: string
   status: ServiceStatus
   url: string | null
-  iconUrl: string | null
   sortOrder: number
 }

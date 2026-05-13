@@ -8,9 +8,12 @@ const statusConfig: Record<ServiceStatus, { label: string; statusClass: string }
 
 interface ServiceCardProps {
   service: Service
+  isEditMode?: boolean
+  onEdit?: () => void
+  onDelete?: () => void
 }
 
-export function ServiceCard({ service }: ServiceCardProps) {
+export function ServiceCard({ service, isEditMode, onEdit, onDelete }: ServiceCardProps) {
   const { label, statusClass } = statusConfig[service.status]
 
   const handleClick = () => {
@@ -31,6 +34,12 @@ export function ServiceCard({ service }: ServiceCardProps) {
         </div>
         <span className={`service-status ${statusClass}`}>{label}</span>
       </div>
+      {isEditMode && (
+        <div className="service-card-actions" onClick={e => e.stopPropagation()}>
+          <button className="card-edit-btn" onClick={onEdit}>수정</button>
+          <button className="card-delete-btn" onClick={onDelete}>삭제</button>
+        </div>
+      )}
     </div>
   )
 }

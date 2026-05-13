@@ -26,9 +26,11 @@ export function LoginPage() {
         await apiClient.post('/api/v1/auth/login', { username, password: encryptedPassword })
         const { data } = await apiClient.get('/api/me')
         authFlag.set()
+        console.log(data)
         authStore.setAuthenticated(true, {
           name: data.name ?? data.preferredUsername ?? data.preferred_username ?? '',
           email: data.email ?? '',
+          roles: Array.isArray(data.roles) ? data.roles : [],
         })
         navigate('/')
       } catch (err: any) {

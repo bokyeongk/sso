@@ -1,6 +1,7 @@
 interface AuthUser {
   name: string
   email: string
+  roles: string[]
 }
 
 interface AuthState {
@@ -23,11 +24,11 @@ function notify() {
 
 export const authStore = {
   getState: () => state,
-  setAuthenticated(isAuth: boolean, user?: { name: string; email: string }) {
+  setAuthenticated(isAuth: boolean, user?: { name: string; email: string; roles: string[] }) {
     state = {
       isAuthenticated: isAuth,
       isLoading: false,
-      user: isAuth && user ? user : null,
+      user: isAuth && user ? { name: user.name, email: user.email, roles: user.roles } : null,
     }
     notify()
   },
