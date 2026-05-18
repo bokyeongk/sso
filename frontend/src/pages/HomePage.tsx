@@ -6,16 +6,18 @@ import type { ServicePayload } from '../hooks/useServiceMutations'
 import { ServiceCard } from '../components/service/ServiceCard'
 import { ServiceEmptyState } from '../components/service/ServiceEmptyState'
 import { ServiceFormModal } from '../components/service/ServiceFormModal'
+import { ProfileModal } from '../components/profile/ProfileModal'
 import type { Service } from '../types/service'
 
 export function HomePage() {
   const { user, logout } = useAuth()
-  const isAdmin = user?.roles?.includes('admin') ?? false
+  const isAdmin = user?.roles?.includes('ADMIN') ?? false
   const { data: services, isLoading, isError } = useServices()
 
   const [isEditMode, setIsEditMode] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editTarget, setEditTarget] = useState<Service | null>(null)
+  const [showProfileModal, setShowProfileModal] = useState(false)
 
   const createMutation = useCreateService()
   const updateMutation = useUpdateService()
@@ -42,23 +44,16 @@ export function HomePage() {
           <div className="home-header-left">
             <h1 className="home-title">Hubilon SSO</h1>
             {isAdmin && (
-              <>
-                <button className="edit-mode-btn" onClick={() => setIsEditMode(v => !v)}>
-                  {isEditMode ? '편집 종료' : '편집 모드'}
-                </button>
-                {isEditMode && (
-                  <button className="add-service-btn" onClick={() => setShowCreateModal(true)}>
-                    + 추가
-                  </button>
-                )}
-              </>
+              <button className="edit-mode-btn" onClick={() => setIsEditMode(v => !v)}>
+                {isEditMode ? '뷰 모드' : '편집 모드'} 전환
+              </button>
             )}
           </div>
           <div className="home-header-right">
             {user?.name && (
-              <span className="home-username">
+              <button className="home-username profile-btn" /* onClick={() => setShowProfileModal(true)} */>
                 {user.name}{user.email && ` (${user.email})`}
-              </span>
+              </button>
             )}
             <button className="logout-btn" onClick={logout}>로그아웃</button>
           </div>
@@ -66,7 +61,14 @@ export function HomePage() {
       </header>
 
       <main className="home-main">
-        <h2 className="service-list-title">서비스 목록</h2>
+        <div className="service-list-header">
+          <h2 className="service-list-title">서비스 목록</h2>
+          {isAdmin && isEditMode && (
+            <button className="add-service-btn" onClick={() => setShowCreateModal(true)}>
+              + 추가
+            </button>
+          )}
+        </div>
 
         {isLoading && (
           <div className="home-status">
@@ -115,6 +117,9 @@ export function HomePage() {
           onSubmit={handleUpdate}
           isSubmitting={updateMutation.isPending}
         />
+      )}
+      {showProfileModal && (
+        <ProfileModal onClose={() => setShowProfileModal(false)} />
       )}
     </div>
   )

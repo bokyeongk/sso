@@ -14,12 +14,12 @@ export function useAuthInit() {
   useEffect(() => {
     apiClient.get('/api/me')
       .then(res => {
-        const d = res.data
+        const me = res.data.data
         authFlag.set()
         authStore.setAuthenticated(true, {
-          name: d.name ?? d.preferredUsername ?? d.preferred_username ?? '',
-          email: d.email ?? '',
-          roles: Array.isArray(d.roles) ? d.roles : [],
+          name: me.name ?? '',
+          email: me.email ?? '',
+          roles: Array.isArray(me.roles) ? me.roles : [],
         })
       })
       .catch(() => {

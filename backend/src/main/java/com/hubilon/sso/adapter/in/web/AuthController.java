@@ -30,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
+    public ResponseEntity login(
         @Valid @RequestBody LoginRequestDto dto,
         HttpServletRequest request,
         HttpServletResponse response,
@@ -43,7 +43,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(
+    public ResponseEntity register(
         @Valid @RequestBody RegisterRequestDto dto,
         CsrfToken csrfToken
     ) {

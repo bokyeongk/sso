@@ -7,15 +7,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
-    INTERNAL_SERVER_ERROR("E001", "내부 서버 오류"),
-    INVALID_INPUT("E002", "잘못된 입력값"),
-    UNAUTHORIZED("E003", "인증이 필요합니다"),
-    FORBIDDEN("E004", "접근 권한이 없습니다"),
-    NOT_FOUND("E005", "리소스를 찾을 수 없습니다"),
-    AUTH_TOKEN_EXCHANGE_FAILED("E006", "토큰 교환에 실패했습니다."),
-    DECRYPTION_FAILED("E007", "비밀번호 복호화에 실패했습니다."),
-    SERVICE_NOT_FOUND("E008", "서비스를 찾을 수 없습니다");
+    INTERNAL_SERVER_ERROR("E001"),
+    INVALID_INPUT("E002"),
+    UNAUTHORIZED("E003"),
+    FORBIDDEN("E004"),
+    NOT_FOUND("E005"),
+    AUTH_TOKEN_EXCHANGE_FAILED("E006"),
+    DECRYPTION_FAILED("E007"),
+    SERVICE_NOT_FOUND("E008"),
+    DUPLICATE_USERNAME("E009"),
+    DUPLICATE_EMAIL("E010");
 
     private final String code;
-    private final String message;
 }

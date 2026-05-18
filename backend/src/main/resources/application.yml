@@ -3,6 +3,9 @@ spring:
     active: dev
   application:
     name: sso-backend
+  messages:
+    basename: messages
+    encoding: UTF-8
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -36,6 +39,8 @@ keycloak:
   client-id: ${KEYCLOAK_CLIENT_ID}
   client-secret: ${KEYCLOAK_CLIENT_SECRET}
   secure-cookie: false                      # 로컬 HTTP 개발 시 false, HTTPS 배포 시 true
+  access-token-cookie: _a_t         # access token 쿠키 이름 (기본값: access_token)
+  refresh-token-cookie: _r_t       # refresh token 쿠키 이름 (기본값: refresh_token)
   redirect-uri: ${KEYCLOAK_REDIRECT_URI}          # 콜백 URL (각 서비스마다 다르게)
   post-login-redirect-uri: ${KEYCLOAK_POST_LOGIN_REDIRECT_URI}               # 로그인 후 이동 경로
   post-logout-redirect-uri: ${KEYCLOAK_POST_LOGOUT_REDIRECT_URI}  # 로그아웃 후 이동할 URL

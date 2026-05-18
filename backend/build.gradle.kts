@@ -40,7 +40,11 @@ dependencies {
 //    implementation(files("libs/common-auth-lib-1.0.11.jar"))
 
     /* 2.0.0 springboot 4버전 */
-    implementation(files("libs/common-auth-lib-2.0.0.jar"))
+    /* 2.0.1 회원정보 수정 메소드 추가 
+             role 관리 (realms/service-client) 추가
+             에러로그 추가
+             accessToken, refreshToken customKey 설정 추가*/
+    implementation(files("libs/common-auth-lib-2.0.2.jar"))
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-security")
 

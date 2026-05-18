@@ -46,7 +46,17 @@
       "WebSearch",
       "Bash(./gradlew wrapper *)",
       "Bash(Select-String -Pattern \"HibernateException|DialectFactory|dialect|Caused by|FAILED|ERROR\")",
-      "Bash(Select-Object -First 60)"
+      "Bash(Select-Object -First 60)",
+      "Bash(npx tsc *)",
+      "Bash(grep -E \"\\\\.java$|\\\\.class$\")",
+      "Bash(javap -p com/hubilon/auth/KeycloakAuthService.class)",
+      "Bash(javap -p com/hubilon/auth/KeycloakClient.class)",
+      "Bash(javap -p com/hubilon/auth/UserInfo.class)",
+      "Bash(javap -classpath common-auth-lib-2.0.2.jar com.hubilon.auth.KeycloakClient)",
+      "Bash(javap -classpath common-auth-lib-2.0.2.jar com.hubilon.auth.KeycloakAuthService)",
+      "Bash(javap -classpath common-auth-lib-2.0.2.jar com.hubilon.auth.UserInfo)",
+      "Bash(javap -classpath common-auth-lib-2.0.2.jar com.hubilon.auth.UserContext)",
+      "Skill(bk_review)"
     ]
   }
 }

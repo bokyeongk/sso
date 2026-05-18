@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(jar tf *)",
+      "Bash(javap -classpath libs/common-auth-lib-2.0.2.jar com.hubilon.auth.UserInfo)",
+      "Bash(Get-Content *)",
+      "PowerShell(Get-ChildItem \"C:\\\\workspace\\\\00.base\\\\claude\\\\00.sso\\\\sso\\\\frontend\\\\src\" | ForEach-Object { $_.Name })",
+      "PowerShell(Get-ChildItem \"C:\\\\workspace\\\\00.base\\\\claude\\\\00.sso\\\\sso\\\\frontend\\\\src\\\\services\" | ForEach-Object { $_.Name })",
+      "PowerShell(Get-ChildItem \"C:\\\\workspace\\\\00.base\\\\claude\\\\00.sso\\\\sso\\\\frontend\\\\src\\\\lib\" | ForEach-Object { $_.Name })",
+      "PowerShell(Get-ChildItem \"C:\\\\workspace\\\\00.base\\\\claude\\\\00.sso\\\\sso\\\\frontend\\\\src\\\\hooks\" | ForEach-Object { $_.Name })",
+      "PowerShell(Get-ChildItem \"C:\\\\workspace\\\\00.base\\\\claude\\\\00.sso\\\\sso\\\\frontend\\\\src\\\\pages\" | ForEach-Object { $_.Name })"
+    ]
+  }
+}

@@ -4,11 +4,11 @@ import apiClient from '../lib/apiClient'
 import { authStore } from '../store/authStore'
 import { authFlag } from '../hooks/useAuthInit'
 import { useRsaEncrypt } from '../hooks/useRsaEncrypt'
+import {errorStore} from "../store/errorStore.ts";
 
 export function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
@@ -17,7 +17,7 @@ export function LoginPage() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault()
-    setError(null)
+    errorStore.setError(null)
     setLoading(true)
 
     const attemptLogin = async (retried = false): Promise<void> => {
@@ -26,9 +26,8 @@ export function LoginPage() {
         await apiClient.post('/api/v1/auth/login', { username, password: encryptedPassword })
         const { data } = await apiClient.get('/api/me')
         authFlag.set()
-        console.log(data)
         authStore.setAuthenticated(true, {
-          name: data.name ?? data.preferredUsername ?? data.preferred_username ?? '',
+          name: data.username ?? data.preferredUsername ?? data.preferred_username ?? '',
           email: data.email ?? '',
           roles: Array.isArray(data.roles) ? data.roles : [],
         })
@@ -39,7 +38,7 @@ export function LoginPage() {
           invalidate()
           return attemptLogin(true)
         }
-        setError(msg ?? '로그인 처리 중 오류가 발생했습니다.')
+        errorStore.setError(msg ?? '로그인 처리 중 오류가 발생했습니다.')
       }
     }
 
@@ -91,7 +90,6 @@ export function LoginPage() {
             />
           </div>
 
-          {error && <p className="login-error">{error}</p>}
 
           <button className="login-btn" type="submit" disabled={loading}>
             {loading ? '로그인 중...' : '로그인'}

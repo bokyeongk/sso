@@ -40,7 +40,6 @@ export function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [phone, setPhone] = useState('')
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
-  const [serverError, setServerError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [passwordTouched, setPasswordTouched] = useState(false)
   const [confirmTouched, setConfirmTouched] = useState(false)
@@ -173,7 +172,6 @@ export function RegisterPage() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault()
-    setServerError(null)
 
     if (!validate()) return
 
@@ -194,12 +192,11 @@ export function RegisterPage() {
         })
         navigate('/login', { state: { registered: true } })
       } catch (err: any) {
-        const msg = err?.response?.data?.message
-        if (!retried && msg === '비밀번호 복호화에 실패했습니다.') {
+        const code = err?.response?.data?.code
+        if (!retried && code === 'E007') {
           invalidate()
           return attemptRegister(true)
         }
-        setServerError(msg ?? '회원가입 처리 중 오류가 발생했습니다.')
       }
     }
 
@@ -373,8 +370,6 @@ export function RegisterPage() {
               <p className="auth-field-error">{fieldErrors.phone}</p>
             )}
           </div>
-
-          {serverError && <p className="login-error">{serverError}</p>}
 
           <button className="login-btn" type="submit" disabled={loading}>
             {loading ? '처리 중...' : '회원가입'}
